@@ -70,7 +70,7 @@ function draw() {
     if(gameState > 0) {
         background("white");
         imageMode(CENTER);
-        image(bg2,camera.position.x,camera.position.y,800,400);
+        image(bg2,camera.position.x,camera.position.y,1200,400);
 
         cam.x = camera.position.x;
         cam.y = camera.position.y;
@@ -178,10 +178,10 @@ function draw() {
         gameState = 0;
     }
 
-    if(touches.length > 0) {
-        //jump
-        if(touchX >= 710 && touchX <= 760
-        && touchY >= 335 && touchY <= 385) {
+    if(touches.length > 0 && gameState === 1) {
+        for(var a = 0; a < touches.length; a++) {//jump
+        if(touches[a].x >= 710 && touches[a].x <= 760
+        && touches[a].y >= 335 && touches[a].y <= 385) {
             player.yCounter = player.yCounter + 1;
             if(player.yCounter <= 1) {
                 player.body.velocityY = -14;
@@ -189,16 +189,16 @@ function draw() {
         }
 
         //left
-        if(touchX >= 10 && touchX <= 60
-        && touchY >= 335 && touchY <= 385) {
+        if(touches[a].x >= 10 && touches[a].x <= 60
+        && touches[a].y >= 335 && touches[a].y <= 385) {
             player.body.velocityX = -5;
             player.xDirection = -1;
             player.xCounter = 1;
         }
 
         //right
-        else if(touchX >= 70 && touchX <= 120
-        && touchY >= 335 && touchY <= 385) {
+        else if(touches[a].x >= 70 && touches[a].x <= 120
+        && touches[a].y >= 335 && touches[a].y <= 385) {
             player.body.velocityX = 5;
             player.xDirection = 1;
             player.xCounter = 1;
@@ -208,6 +208,7 @@ function draw() {
             player.body.velocityX = 0;
             player.xCounter = 0;
         }
+    }
     }
 
     if(mouseIsPressed) {
@@ -334,6 +335,8 @@ function mousePressed() {
         }
     }
 }
+
+
 
 
 
