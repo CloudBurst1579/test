@@ -20,16 +20,18 @@ class Collectible
             this.body.visible = false;
         }
 
-        drawSprites();
-    }
-
-    collected() {
-        if(player.body.isTouching(this.body)) {
+        if(player.body.isTouching(this.body) && gameState === 1) {
             this.life = 0;
             score = score + 50;
             this.body.position.x = null;
             this.body.position.y = null;
         }
+
+        drawSprites();
+    }
+
+    static collected() {
+        console.log("true");
     }
 
     reset() {

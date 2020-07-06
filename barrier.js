@@ -6,11 +6,19 @@ class Barrier
         this.yLimit1 = y1;
         this.colliding = 0;
         this.platform = loadImage("movingPlatform.png");
+        this.body.visible = false;
     }
 
     display() {
         this.body.shapeColor = rgb(0,255,0);
-        this.body.visible = false;
+
+        imageMode(CENTER);
+        image(this.platform,this.body.position.x,this.body.position.y,this.body.width,this.body.height);
+
+        if(gameState > 1) {
+            this.body.velocityX = 0;
+            this.body.velocityY = 0;
+        }
 
         var tar = this.body;
         var obj = player.body;
@@ -21,14 +29,12 @@ class Barrier
             && obj.position.x - tar.position.x <= tar.width/2 + obj.width/2 - 1)
         {
             this.colliding = 1;
+            //player.yCounter = 0;
         }
         else {
             this.colliding = 0;          
         }
         colliding.unshift(this.colliding);
-
-        imageMode(CENTER);
-        image(this.platform,this.body.position.x,this.body.position.y,this.body.width,this.body.height);
     }
 
     hMotion(x2,speed) {
@@ -57,10 +63,6 @@ class Barrier
             }
     }
 
-    freeze() {
-            this.body.velocityX = 0;
-            this.body.velocityY = 0;
-    }
 
     reset() {
         this.body.position.x = this.xLimit1;

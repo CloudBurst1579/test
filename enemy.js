@@ -16,7 +16,7 @@ class Enemy
         this.walk = loadAnimation("orcSprites/walk/orcWalk000.png","orcSprites/walk/orcWalk009.png");
         this.attack = loadAnimation("orcSprites/attack/orcAttack005.png","orcSprites/attack/orcAttack009.png");
     
-        this.body.addAnimation("walk",this.walk);
+        this.body.addAnimation("walk",this.walk).frameDelay = 4;
         this.body.addAnimation("attack",this.attack).looping = false;
     }
 
@@ -28,7 +28,7 @@ class Enemy
         if(this.playerAttacked === 0) {
             this.body.mirrorX(this.direction);
         }
-        else {
+        else if(this.playerAttacked === 1) {
             if(player.body.position.x > this.body.position.x) {
                 this.body.mirrorX(1);
             }
@@ -39,6 +39,13 @@ class Enemy
 
         if(this.life === 1) {
                 this.body.shapeColor = "red";
+                if(gameState === 1 && this.playerAttacked === 0) {
+                    this.body.changeAnimation("walk");
+                }
+    
+                else if(this.playerAttacked === 1) {
+                    this.body.changeAnimation("attack");
+                }
                 this.body.visible = true;
             }
 
@@ -51,22 +58,18 @@ class Enemy
         if(this.life === 1) {
             var obj = this.body;
             var tar = player.body;
+
             if(obj.position.y - tar.position.y < 20
             && tar.position.y - obj.position.y < 55 
-            && obj.position.x - tar.position.x < 55
-            && tar.position.x - obj.position.x < 55)
+            && obj.position.x - tar.position.x < 60
+            && tar.position.x - obj.position.x < 60)
             {
                 player.life = 0;
                 gameState = 2;
                 this.playerAttacked = 1;
-                this.body.changeAnimation("attack");
             }
 
-            else if(gameState === 1) {
-                this.body.changeAnimation("walk");
-            }
-
-            else {
+            if(gameState > 1) {
                 this.body.addAnimation("walk",this.walk).stop();
             }
         }
@@ -76,22 +79,15 @@ class Enemy
             this.body.position.x = null;
             this.body.position.y = null;
         }
+
+        if(gameState === 2) {
+            this.body.velocityX = 0;
+            this.body.velocityY = 0;
+        }
     }
 
     collide(target) {
         this.body.collide(target.body);
-    }
-
-    friction(target) {
-        var tar = target.body;
-        var obj = this.body;
-        if(tar.position.y - obj.position.y <= tar.height + obj.height + 2
-           && tar.position.y > obj.position.y
-           && tar.position.x - obj.position.x <= tar.width/2 + 1
-           && tar.position.x - obj.position.x >= -1 * (tar.width/2 + 1))
-        {
-            this.body.velocityX = this.body.velocityX + target.body.velocityX;
-        }
     }
 
     motion(x2, speed) {
@@ -110,20 +106,13 @@ class Enemy
         }
     }
 
-    freeze() {
-        if(gameState === 2) {
-            this.body.velocityX = 0;
-            this.body.velocityY = 0;
-        }
-    }
-
     reset() {
         this.body.position.x = this.xLimit1;
         this.body.position.y = this.y - 5;
         this.life = 1; 
         this.playerAttacked = 0;
         this.body.addAnimation("attack",this.attack).rewind(); 
-        this.body.addAnimation("attack",this.attack).looping = false; 
-        this.body.addAnimation("walk",this.walk).play();     
+        this.body.addAnimation("attack",this.attack).looping = false;
+        this.body.addAnimation("walk",this.walk).play();   
     }
 }

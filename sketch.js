@@ -1,10 +1,12 @@
 var colliding = [];
 var score = 0,cam;
-var gameState = 0;
+var gameState = 0,resetCounter = 0;
 
 var upArrow,leftArrow,rightArrow;
 
 var bg1,bg2,up,left,right;
+
+var touched = 0;
 
 function preload() {
     bg1 = loadImage("bg1.png");
@@ -17,26 +19,29 @@ function preload() {
     home = loadImage("buttonImages/home.png");
     restart = loadImage("buttonImages/restart.png");
     play = loadImage("buttonImages/play.png");
+
+    player = new Player(200,375);
+
+    enemy1 = new Enemy(700,375,39,60);
+    enemy2 = new Enemy(1600,375,35,60);
 }
 
 function setup() {
     createCanvas(800, 400);
-    player = new Player(200,375);
 
-    jewel= new Target(2350,370);
+    jewel= new Target(4000,370);
 
-    enemy1 = new Enemy(700,375,39,60);
-    //enemy2 = new Enemy(800,375,35,60);
+    coin1 = new Collectible(300,380);
+    coin2 = new Collectible(320,380);
+    coin3 = new Collectible(340,380);
+    coin4 = new Collectible(360,380);
+    coin5 = new Collectible(380,380);
 
-    coin = new Collectible(500,380);
-
-    ground  = new Barrier(1200,400,2400,10);
-    platform1 = new Barrier(500,300,200,10);
-    platform2 = new Barrier(1000,100,200,10);
-
-    //home = new Button(40,40,"home");
-    //restart = new Button(90,40,"restart"); 
-    //play = new Button(400,camera.position.y + 10,"play");
+    ground1  = new Barrier(500,400,1000,10);
+    ground2 = new Barrier(2000,400,1000,10);
+    platform1 = new Barrier(1000,300,200,10);
+    platform2 = new Barrier(2500,100,200,10);
+    platform3 = new Barrier(1900,300,400,10);
     
     upArrow = createSprite(335,360,50,50);
     upArrow.visible = false;
@@ -50,6 +55,7 @@ function setup() {
  
 function draw() {
     if(gameState === 0) {
+        //resetCounter = 0;
         background(bg1);
         textAlign(CENTER);
         textSize(35);
@@ -70,33 +76,41 @@ function draw() {
     if(gameState > 0) {
         background("white");
         imageMode(CENTER);
-        image(bg2,camera.position.x,camera.position.y,1200,400);
+        image(bg2,camera.position.x,camera.position.y,800,400);
 
         cam.x = camera.position.x;
         cam.y = camera.position.y;
 
-        ground.display();
+        ground1.display();
+        ground2.display();
         platform1.display();
         platform2.display();
+        platform3.display();
 
         enemy1.display();
-        enemy1.collide(ground);
-        //enemy2.display();
-        //enemy2.collide(ground);       
+        enemy1.collide(ground1);
+        enemy2.display();
+        enemy2.collide(ground2);       
 
-        coin.display();
+        coin1.display();
+        coin2.display();
+        coin3.display();
+        coin4.display();
+        coin5.display();
 
         jewel.display();
 
         player.display();
-        player.collide(ground);
+        player.collide(ground1);
+        player.collide(ground2);
         player.collide(platform1);
         player.collide(platform2);
+        player.collide(platform3);
 
         tint(255,128);    
         image(up,upArrow.position.x,upArrow.position.y,upArrow.width,upArrow.height);
         image(left,leftArrow.position.x,leftArrow.position.y,leftArrow.width,leftArrow.height);
-        image(right,rightArrow.position.x,rightArrow.position.y,rightArrow.width,rightArrow.height);   
+        image(right,rightArrow.position.x,rightArrow.position.y,rightArrow.width,rightArrow.height);
 
         textSize(20);
         fill(255);
@@ -104,18 +118,18 @@ function draw() {
     }
        
     if(gameState === 1) {
-        platform1.hMotion(800,3);
+        //resetCounter = 0;
+        platform1.hMotion(1500,4);
         platform2.vMotion(300,2);
 
         enemy1.motion(800,2);
+        enemy2.motion(1700,2);
 
         player.move();
         player.stomp(enemy1);
-        //player.stomp(enemy2);
+        player.stomp(enemy2);
         player.friction(platform1);
         player.friction(platform2);
-
-        coin.collected();
 
         upArrow.position.x = camera.position.x + 335;
         upArrow.position.y = camera.position.y + 160;
@@ -134,13 +148,7 @@ function draw() {
         textAlign(CENTER);
         textSize(25);
         fill(255);
-        text("GAME OVER",camera.position.x,camera.position.y - 10);
-
-        platform1.freeze();
-        platform2.freeze();
-
-        enemy1.freeze();
-        //enemy2.freeze(); 
+        text("GAME OVER",camera.position.x,camera.position.y - 10); 
         
         tint(255,128);
         imageMode(CENTER);
@@ -153,14 +161,6 @@ function draw() {
         textSize(25);
         fill(255);
         text("YOU WIN!",camera.position.x,camera.position.y - 10); 
-        
-        platform1.freeze();
-        platform2.freeze();
-
-        enemy1.freeze();
-        //enemy2.freeze();  
-
-        player.freeze();
 
         tint(255,128);
         imageMode(CENTER);
@@ -178,10 +178,10 @@ function draw() {
         gameState = 0;
     }
 
-    if(touches.length > 0 && gameState === 1) {
-        for(var a = 0; a < touches.length; a++) {//jump
-        if(touches[a].x >= 710 && touches[a].x <= 760
-        && touches[a].y >= 335 && touches[a].y <= 385) {
+    if(touched === 1 && gameState === 1) {
+        //jump
+        if(touchX >= 710 && touchX <= 760
+        && touchY >= 335 && touchY <= 385) {
             player.yCounter = player.yCounter + 1;
             if(player.yCounter <= 1) {
                 player.body.velocityY = -14;
@@ -189,35 +189,35 @@ function draw() {
         }
 
         //left
-        if(touches[a].x >= 10 && touches[a].x <= 60
-        && touches[a].y >= 335 && touches[a].y <= 385) {
+        if(touchX >= 10 && touchX <= 60
+        && touchY >= 335 && touchY <= 385) {
             player.body.velocityX = -5;
             player.xDirection = -1;
             player.xCounter = 1;
         }
 
         //right
-        else if(touches[a].x >= 70 && touches[a].x <= 120
-        && touches[a].y >= 335 && touches[a].y <= 385) {
+        else if(touchX >= 70 && touchX <= 120
+        && touchY >= 335 && touchY <= 385) {
             player.body.velocityX = 5;
             player.xDirection = 1;
             player.xCounter = 1;
         }
 
-        else {
+        else if(player.keyPressed === 0) {
             player.body.velocityX = 0;
             player.xCounter = 0;
         }
     }
-    }
 
-    if(mouseIsPressed) {
+    if(mouseIsPressed && gameState === 1 && touched === 1) {
         //jump
         if(mouseX >= 710 && mouseX <= 760
         && mouseY >= 335 && mouseY <= 385) {
             player.yCounter = player.yCounter + 1;
             if(player.yCounter <= 1) {
                 player.body.velocityY = -14;
+                console.log("up");
             }    
         }
         
@@ -227,6 +227,7 @@ function draw() {
             player.body.velocityX = -5;
             player.xDirection = -1;
             player.xCounter = 1;
+            console.log("left");
         }
             
         //right
@@ -235,24 +236,31 @@ function draw() {
             player.body.velocityX = 5;
             player.xDirection = 1;
             player.xCounter = 1;
+            console.log("right");
         }
-    
-        else {
+
+        else if(player.keyPressed === 0) {
             player.body.velocityX = 0;
             player.xCounter = 0;
         }
     }
 
     colliding.splice(0);
+    console.log(touched);
 }
 
 function reset() {
+    resetCounter = 1;
     player.reset();
 
     enemy1.reset();
-    //enemy2.reset();
+    enemy2.reset();
 
-    coin.reset();
+    coin1.reset();
+    coin2.reset();
+    coin3.reset();
+    coin4.reset();
+    coin5.reset();
 
     platform1.reset();
     platform2.reset();
@@ -261,11 +269,19 @@ function reset() {
 }
 
 function touchStarted() {
-    if(gameState === 0 
-    && touchX >= 370 && touchX <= 420
-    && touchY >= 180 && touchY <= 230) {
+    touched = 1;
+
+    if(gameState === 0) { 
+        if(touchX >= 370 && touchX <= 420
+        && touchY >= 180 && touchY <= 230) {
             gameState = 1;
         }
+
+        if(touchX >= 370 && touchX <= 420
+        && touchY >= 190 && touchY <= 240) {
+                gameState = 0.5;
+            }
+    }
     
     if(gameState === 1) { 
         //home button (position)
@@ -298,7 +314,12 @@ function touchStarted() {
     }
 }
 
+function touchEnded() {
+    touched = 0;
+}
+
 function mousePressed() {
+    touched = 1;
     if(gameState === 0 
     && mouseX >= 370 && mouseX <= 420
     && mouseY >= 180 && mouseY <= 230) {
@@ -334,6 +355,10 @@ function mousePressed() {
             reset();
         }
     }
+}
+
+function mouseReleased() {
+    touched = 0;
 }
 
 

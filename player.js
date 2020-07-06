@@ -13,6 +13,7 @@ class Player
         this.body.velocityY = 0;
         this.xDirection = 1;
         this.life = 1;
+        this.keyPressed = 0;
 
         this.idle = loadAnimation("playerAnimations/idle/Idle000.png","playerAnimations/idle/Idle009.png");
         this.run = loadAnimation("playerAnimations/run/Run000.png","playerAnimations/run/Run009.png");
@@ -21,15 +22,26 @@ class Player
         this.win = loadImage("playerAnimations/idle/Idle000.png");
         
         this.body.addAnimation("idle",this.idle);
-        this.body.addAnimation("run",this.run);
+        this.body.addAnimation("run",this.run).frameDelay = 3;
         this.body.addAnimation("jump",this.jump);
         this.body.addAnimation("dead",this.dead).looping = false;
         this.body.addImage("win",this.win);
     }
 
     display() {
+        var c1 = 0;
+        for(var i = 0; i < colliding.length; i++) {
+            c1 = c1 + colliding[i];
+        }
+        
+        if(c1 === 0) {
+            this.body.velocityY = this.body.velocityY + 0.8;
+        }
+
         this.body.shapeColor = "blue";
-        camera.position.x = this.body.position.x;
+        if(this.body.position.x > 400) {
+            camera.position.x = this.body.position.x;
+        }
         if(this.body.position.y < 200) {
             camera.position.y = this.body.position.y;
         }
@@ -38,6 +50,11 @@ class Player
         }
 
         this.body.mirrorX(this.xDirection);
+
+        /*if(this.yCounter === 0) {
+            this.body.addAnimation("jump",this.jump).rewind();
+            this.body.addAnimation("jump",this.jump).looping = false;
+        }*/
 
         if(gameState === 1 && this.xCounter > 0 && this.yCounter < 1) {
             this.body.changeAnimation("run");
@@ -64,6 +81,11 @@ class Player
             this.life = 0;
             gameState = 2;
             camera.position.y = 200;
+        }
+
+        if(gameState > 1) {
+            this.body.velocityX = 0;
+            this.body.velocityY = 0;
         }
 
         drawSprites();
@@ -104,46 +126,33 @@ class Player
     }
 
     move() {
-        var c1 = 0;
-        for(var i = 0; i < colliding.length; i++) {
-            c1 = c1 + colliding[i];
-        }
-
-        if(c1 === 0) {
-            this.body.velocityY = this.body.velocityY + 0.8;
-        }
-        else {
-            this.yCounter = 0;
-        }
-
         if(keyDown("UP_ARROW")||keyDown("W")) {
             this.yCounter = this.yCounter + 1;
             if(this.yCounter <= 1) {
                 this.body.velocityY = -14;
-            }           
+            } 
+            this.keyPressed = 1;          
         }
 
         if(keyDown("LEFT_ARROW")||keyDown("A")) {
             this.body.velocityX = -5;
             this.xDirection = -1;
             this.xCounter = 1;
+            this.keyPressed = 1;     
         }
 
         else if(keyDown("RIGHT_ARROW")||keyDown("d")) {
             this.body.velocityX = 5;
             this.xDirection = 1;
             this.xCounter = 1;
+            this.keyPressed = 1;     
         }
             
         else {
             this.body.velocityX = 0;
             this.xCounter = 0;
+            this.keyPressed = 0;     
         }
-    }
-
-    freeze() {
-        this.body.velocityX = 0;
-        this.body.velocityY = 0;
     }
 
     reset() {
@@ -152,6 +161,8 @@ class Player
         this.life = 1;  
         this.xDirection = 1;
         this.body.addAnimation("dead",this.dead).rewind(); 
-        this.body.addAnimation("dead",this.dead).looping = false;  
+        this.body.addAnimation("dead",this.dead).looping = false;
+        camera.position.x = 400;
+        camera.position.y = 200;  
     }
 }
