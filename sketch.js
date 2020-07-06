@@ -246,7 +246,7 @@ function draw() {
     }
 
     colliding.splice(0);
-    console.log(touched);
+    console.log(touches);
 }
 
 function reset() {
