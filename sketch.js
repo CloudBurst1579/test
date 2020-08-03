@@ -191,6 +191,9 @@ function draw() {
         b = null;     
     }
 
+    textSize(35);
+    fill(255);
+    text(a+" "+b,400,50);
         /*if(gameState === 1) {
         //jump
         if(a.x >= 710 && a.y <= 760
