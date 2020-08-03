@@ -6,7 +6,7 @@ var upArrow,leftArrow,rightArrow;
 
 var bg1,bg2,up,left,right;
 
-var touched = 0;
+var a,b;
 
 function preload() {
     bg1 = loadImage("bg1.png");
@@ -178,10 +178,31 @@ function draw() {
         gameState = 0;
     }
 
-    if(touched === 1 && gameState === 1) {
+    if(touches.length === 1) {
+        a = touches[0];
+    }
+    else if(touches.length === 2) {
+        a = touches[0];
+        b = touches[1];
+    }
+
+    else if(touches.length === 0) {
+        a = null;
+        b = null;     
+    }
+
+        /*if(gameState === 1) {
         //jump
-        if(touchX >= 710 && touchX <= 760
-        && touchY >= 335 && touchY <= 385) {
+        if(a.x >= 710 && a.y <= 760
+        && a.y >= 335 && b.y <= 385) {
+            player.yCounter = player.yCounter + 1;
+            if(player.yCounter <= 1) {
+                player.body.velocityY = -14;
+            }    
+        }
+
+        if(b.x >= 710 && b.y <= 760
+        && b.y >= 335 && b.y <= 385) {
             player.yCounter = player.yCounter + 1;
             if(player.yCounter <= 1) {
                 player.body.velocityY = -14;
@@ -189,28 +210,42 @@ function draw() {
         }
 
         //left
-        if(touchX >= 10 && touchX <= 60
-        && touchY >= 335 && touchY <= 385) {
+        if(a.x >= 10 && a.x <= 60
+        && a.y >= 335 && a.y <= 385) {
             player.body.velocityX = -5;
             player.xDirection = -1;
             player.xCounter = 1;
         }
 
+        else if(b.x >= 10 && b.x <= 60
+            && b.y >= 335 && b.y <= 385) {
+                player.body.velocityX = -5;
+                player.xDirection = -1;
+                player.xCounter = 1;
+            }
+
         //right
-        else if(touchX >= 70 && touchX <= 120
-        && touchY >= 335 && touchY <= 385) {
+        else if(a.x >= 70 && a.x <= 120
+        && a.y >= 335 && a.y <= 385) {
             player.body.velocityX = 5;
             player.xDirection = 1;
             player.xCounter = 1;
         }
 
+        else if(b.x >= 70 && b.x <= 120
+            && b.y >= 335 && b.y <= 385) {
+                player.body.velocityX = 5;
+                player.xDirection = 1;
+                player.xCounter = 1;
+            }
+
         else if(player.keyPressed === 0) {
             player.body.velocityX = 0;
             player.xCounter = 0;
         }
-    }
+    }*/
 
-    if(mouseIsPressed && gameState === 1 && touched === 1) {
+    if(mouseIsPressed && gameState === 1) {
         //jump
         if(mouseX >= 710 && mouseX <= 760
         && mouseY >= 335 && mouseY <= 385) {
@@ -269,8 +304,6 @@ function reset() {
 }
 
 function touchStarted() {
-    touched = 1;
-
     if(gameState === 0) { 
         if(touchX >= 370 && touchX <= 420
         && touchY >= 180 && touchY <= 230) {
@@ -314,12 +347,7 @@ function touchStarted() {
     }
 }
 
-function touchEnded() {
-    touched = 0;
-}
-
 function mousePressed() {
-    touched = 1;
     if(gameState === 0 
     && mouseX >= 370 && mouseX <= 420
     && mouseY >= 180 && mouseY <= 230) {
@@ -355,10 +383,6 @@ function mousePressed() {
             reset();
         }
     }
-}
-
-function mouseReleased() {
-    touched = 0;
 }
 
 
